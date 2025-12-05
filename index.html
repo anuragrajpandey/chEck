@@ -6,8 +6,122 @@
 <title>chEck — Top Movies & Shows</title>
 <meta name="description" content="chEck — trending, popular, and top-rated movies & TV. Mobile-first, responsive UI powered by TMDb." />
 
+<!-- ======= chEck Splash Screen (exact as provided) ======= -->
+<style>
+  /* Splash styles (self-contained) */
+  .splash {
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(180deg,#071018,#020409);
+    z-index:9999;
+    transition:opacity .6s ease, visibility .6s ease;
+    visibility:visible;
+    opacity:1;
+  }
+  .splash.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+  .splash-inner {
+    display:flex;
+    gap:8px;
+    align-items:baseline;
+    justify-content:center;
+    font-weight:800;
+    letter-spacing:1px;
+    color:#ffffff;
+  }
+  .splash-letter {
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    font-size:46px;
+    opacity:0;
+    transform:translateY(6px);
+    transition: all 220ms cubic-bezier(.2,.9,.3,1);
+    color:#f0f6fb;
+  }
+  .splash-letter.big {
+    color:#ffb0c0;
+    font-size:84px;
+    transform:translateY(0);
+    text-shadow:0 10px 30px rgba(255,92,124,0.08);
+  }
+  .splash-letter.show {
+    opacity:1;
+    transform:translateY(0);
+  }
+  .splash-sub{margin-top:12px;color:#9aa6b2;font-size:13px;text-align:center}
+</style>
+
+</head>
+<body>
+
+<!-- Insert the splash block exactly once (unchanged) -->
+<div id="splash" class="splash" aria-hidden="false" role="status" aria-label="Loading chEck">
+  <div style="text-align:center">
+    <div class="splash-inner" id="splashInner" aria-hidden="true"></div>
+    <div class="splash-sub">Loading top movies & shows…</div>
+  </div>
+</div>
+
+<script>
+/* chEck splash initializer (exact as provided)
+   - Types: c h E c k  (E is emphasized)
+   - After typing + short hold, fades out and reveals the page
+   Usage: Place before your main app container; main app should be hidden (visibility:hidden) until splash hides,
+          or splash script will set visibility after hiding.
+*/
+(function initCheckSplash(){
+  const splash = document.getElementById('splash');
+  const splashInner = document.getElementById('splashInner');
+
+  // letters sequence - third letter is capital big E
+  const letters = [
+    {ch:'c', cls:''},
+    {ch:'h', cls:''},
+    {ch:'E', cls:'big'},
+    {ch:'c', cls:''},
+    {ch:'k', cls:''}
+  ];
+
+  // create spans for each letter
+  letters.forEach((l, i) => {
+    const span = document.createElement('span');
+    span.className = 'splash-letter' + (l.cls ? ' ' + l.cls : '');
+    span.textContent = l.ch;
+    // optional: stagger reveal via transitionDelay
+    span.style.transitionDelay = (i * 160) + 'ms';
+    splashInner.appendChild(span);
+  });
+
+  // reveal letters sequentially
+  const spans = Array.from(splashInner.children);
+  spans.forEach((sp, i) => {
+    setTimeout(() => {
+      sp.classList.add('show');
+    }, i * 160);
+  });
+
+  // timing: typing duration + hold, then fade
+  const typingDuration = letters.length * 160;
+  const hold = 800; // ms to hold after typing
+  setTimeout(() => {
+    splash.classList.add('hidden');
+    // reveal main app (if you hide it initially)
+    setTimeout(() => {
+      // if you use a main .app element with visibility:hidden, this will reveal it:
+      const app = document.querySelector('.app');
+      if(app) app.style.visibility = 'visible';
+      splash.setAttribute('aria-hidden','true');
+      // optional: remove splash from DOM after transition
+      setTimeout(()=>{ try{ splash.remove(); }catch(e){} }, 800);
+    }, 600);
+  }, typingDuration + hold);
+})();
+</script>
+<!-- ======= End chEck Splash Screen ======= -->
+
 <!-- =========================
-     Styles (UI + Splash + Filters)
+     Styles (UI + Filters)
      ========================= -->
 <style>
   :root{
@@ -29,12 +143,12 @@
     background: linear-gradient(180deg,var(--bg),#010203 140%);color:#e9f2fb;padding:16px;display:flex;justify-content:center;
     -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   }
-  .app{width:100%;max-width:var(--max-width);display:flex;flex-direction:column;gap:16px;}
+  .app{width:100%;max-width:var(--max-width);display:flex;flex-direction:column;gap:16px;visibility:hidden;}
   header{display:flex;gap:12px;align-items:center;justify-content:space-between}
   .brand{display:flex;gap:12px;align-items:center}
   .text-logo{display:flex;align-items:baseline;gap:6px;font-weight:800}
   .text-logo .small{font-size:16px;color:#e6eef6}
-  .text-logo .bigE{font-size:28px;color:linear-gradient(90deg,var(--accent1),var(--accent2));background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;color:transparent}
+  .text-logo .bigE{font-size:28px;background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;color:transparent}
   .controls{display:flex;gap:8px;align-items:center}
   .search{display:flex;align-items:center;gap:8px;background:var(--card);padding:8px;border-radius:999px;min-width:160px;max-width:600px;width:100%}
   .search input{background:transparent;border:0;color:inherit;outline:none;font-size:14px;width:100%}
@@ -102,27 +216,9 @@
   @media (min-width:520px){ .grid{grid-template-columns:repeat(3,1fr)} }
   @media (min-width:820px){ .grid{grid-template-columns:repeat(4,1fr)} main{align-items:flex-start} }
   @media (max-width:900px){ .right{display:none} main{flex-direction:column} }
-
-  /* splash (kept from previous) */
-  .splash { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,#071018,#020409); z-index:9999; transition:opacity .6s ease, visibility .6s ease; visibility:visible; opacity:1; }
-  .splash.hidden { opacity:0; visibility:hidden; pointer-events:none; }
-  .splash-inner { display:flex; gap:8px; align-items:baseline; justify-content:center; font-weight:800; letter-spacing:1px; color:#ffffff; }
-  .splash-letter { font-family: Inter, system-ui; font-size:46px; opacity:0; transform:translateY(6px); transition: all 220ms cubic-bezier(.2,.9,.3,1); color:#f0f6fb; }
-  .splash-letter.big { color:#ffb0c0; font-size:84px; transform:translateY(0); text-shadow:0 10px 30px rgba(255,92,124,0.08); }
-  .splash-letter.show { opacity:1; transform:translateY(0); }
-  .splash-sub{margin-top:12px;color:var(--muted);font-size:13px;text-align:center}
 </style>
-</head>
-<body>
-<!-- SPLASH -->
-<div id="splash" class="splash" aria-hidden="false" role="status" aria-label="Loading chEck">
-  <div style="text-align:center">
-    <div class="splash-inner" id="splashInner" aria-hidden="true"></div>
-    <div class="splash-sub">Loading top movies & shows…</div>
-  </div>
-</div>
 
-<div class="app" id="app" aria-live="polite" style="visibility:hidden">
+<div class="app" id="app" aria-live="polite">
 
   <!-- HEADER -->
   <header>
@@ -153,10 +249,9 @@
     <button class="tab" data-tab="toprated" role="tab" aria-selected="false">Top Rated</button>
   </nav>
 
-  <!-- FILTERS (new) -->
-  <div class="filter-bar">
+  <!-- FILTERS -->
+  <div class="filter-bar" style="margin-top:6px">
     <div class="chips" id="presetChips">
-      <!-- ready-made dynamic picks -->
       <div class="chip" data-preset="popular">🔥 Popular</div>
       <div class="chip" data-preset="recent">🆕 Latest</div>
       <div class="chip" data-preset="highrated">🏆 Top Rated</div>
@@ -165,7 +260,6 @@
       <div class="chip" data-preset="family">👪 Family</div>
     </div>
 
-    <!-- fancy selects -->
     <div class="fancy-select" id="providerSelect" style="min-width:200px">
       <div class="selected" tabindex="0" aria-haspopup="listbox">
         <span class="label">Provider: <strong id="providerLabel" style="margin-left:8px;color:var(--muted);font-weight:600">Any</strong></span>
@@ -189,7 +283,7 @@
   </div>
 
   <!-- MAIN -->
-  <main>
+  <main style="margin-top:8px">
     <div class="left">
 
       <!-- HERO -->
@@ -250,43 +344,45 @@
      ========================= -->
 <script>
 /* ========== CONFIG ========== */
-const TMDB_API_KEY = c02a52d65d3b4456bdcaf7c2c5a5254f; // <-- Replace with your key
+/* Your TMDb API key (inserted as requested) */
+const TMDB_API_KEY = "c02a52d65d3b4456bdcaf7c2c5a5254f"; // <- your provided key
 const TMDB_BASE = "https://api.themoviedb.org/3";
 const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 
 /* =========================
-   Splash initializer (same as before)
+   Splash: already initialized above (only once)
    ========================= */
-(function initSplash(){
-  const splash = document.getElementById('splash');
-  const splashInner = document.getElementById('splashInner');
-  const letters = [{ch:'c'},{ch:'h'},{ch:'E',cls:'big'},{ch:'c'},{ch:'k'}];
-  letters.forEach((l,i)=>{
-    const sp = document.createElement('span');
-    sp.className = 'splash-letter' + (l.cls ? ' ' + l.cls : '');
-    sp.textContent = l.ch;
-    sp.style.transitionDelay = (i*160)+'ms';
-    splashInner.appendChild(sp);
-  });
-  const spans = Array.from(splashInner.children);
-  spans.forEach((sp,i)=> setTimeout(()=> sp.classList.add('show'), i*160));
-  const total = letters.length*160 + 800;
-  setTimeout(()=>{ splash.classList.add('hidden'); setTimeout(()=>{ document.querySelector('.app').style.visibility='visible'; splash.setAttribute('aria-hidden','true'); },600); }, total+400);
-})();
 
 /* =========================
-   Utilities
+   Utilities (with robust apiFetch)
    ========================= */
 const qs = s => document.querySelector(s);
 const qsa = s => Array.from(document.querySelectorAll(s));
 function apiURL(path, params={}){ const url=new URL(TMDB_BASE+path); url.searchParams.set('api_key', TMDB_API_KEY); Object.entries(params).forEach(([k,v])=>{ if(v!==''&&v!=null) url.searchParams.set(k,v); }); return url.toString();}
+
+/* Robust fetch:
+   - catches network errors
+   - returns {} on error and logs nicely
+   - updates UI with an error card when appropriate
+*/
 async function apiFetch(path, params={}, cacheKey=null){
-  if(!TMDB_API_KEY || TMDB_API_KEY==='YOUR_TMDB_API_KEY_HERE'){ console.error('TMDb key missing'); renderErrorCard('Set TMDb key in code'); throw 'NoKey'; }
+  if(!TMDB_API_KEY || TMDB_API_KEY==='YOUR_TMDB_API_KEY_HERE'){ console.error('TMDb key missing'); renderErrorCard('Set TMDb key in code'); return {}; }
   const url = apiURL(path, params);
-  const r = await fetch(url);
-  if(!r.ok) throw new Error('API '+r.status);
-  return r.json().catch(()=>({}));
+  try{
+    const r = await fetch(url, {mode: 'cors'});
+    if(!r.ok){
+      console.error('TMDb API error', r.status, r.statusText, url);
+      renderErrorCard(`TMDb API error: ${r.status} ${r.statusText}`);
+      return {};
+    }
+    return await r.json().catch(()=> ({}));
+  }catch(err){
+    console.error('Network or fetch error', err);
+    renderErrorCard('Network error. Check console for details.');
+    return {};
+  }
 }
+
 function truncate(s,n){ if(!s) return ''; return s.length>n? s.slice(0,n-1)+'…': s; }
 function escapeHtml(s=''){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -355,9 +451,9 @@ async function openDetails(type,id,opts={}){
     showModal(type,data,opts);
     // load where to watch separately and place in right panel too
     const prov = await apiFetch(`/${type}/${id}/watch/providers`);
-    // put into right panel summary
     const whereEl = qs('#whereToWatch');
-    whereEl.innerHTML = ''; const country = state.region || 'US';
+    whereEl.innerHTML = '';
+    const country = state.region || 'US';
     if(prov && prov.results && prov.results[country]){
       const info = prov.results[country];
       const containers = [];
@@ -365,7 +461,7 @@ async function openDetails(type,id,opts={}){
       if(containers.length===0){ whereEl.textContent = 'Not available in your region.'; return; }
       containers.forEach(group=>{ const wrap=document.createElement('div'); wrap.style.marginTop='8px'; wrap.innerHTML = `<div style="font-size:13px;color:var(--muted);font-weight:700">${group.k.toUpperCase()}</div>`; const row=document.createElement('div'); row.className='provider-list'; group.arr.forEach(p=>{ const b=document.createElement('a'); b.className='provider-badge'; b.href = info.link || '#'; b.target='_blank'; b.rel='noopener'; b.innerHTML = `<img class="provider-logo" src="https://image.tmdb.org/t/p/w92${p.logo_path||''}" alt="${escapeHtml(p.provider_name)}"> <span>${escapeHtml(p.provider_name)}</span>`; row.appendChild(b); }); wrap.appendChild(row); whereEl.appendChild(wrap); });
     } else { whereEl.textContent = 'Provider info not available for your region.'; }
-  }catch(e){ console.error(e); }
+  }catch(e){ console.error(e); renderErrorCard('Unable to load details.'); }
 }
 
 function showModal(type,data,opts={}){
@@ -374,7 +470,6 @@ function showModal(type,data,opts={}){
   const modal = document.createElement('div'); modal.className='modal'; modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true');
   const poster = data.poster_path? IMG_BASE+data.poster_path : ''; const title = data.title||data.name||'Untitled'; const date=(data.release_date||data.first_air_date||'').slice(0,4);
   const rating = data.vote_average?Number(data.vote_average).toFixed(1):'—'; const overview=data.overview||'No synopsis available.'; const genres=(data.genres||[]).map(g=>g.name).join(', ');
-  // trailer
   let trailerKey=null; if(data.videos && data.videos.results){ const vids=data.videos.results; const t=vids.find(v=>v.type.toLowerCase().includes('trailer')&&v.site==='YouTube')||vids[0]; if(t) trailerKey=t.key; }
   modal.innerHTML = `
     <div class="left">
@@ -401,12 +496,11 @@ function showModal(type,data,opts={}){
   qs('#tmdbLink',modal).href = `https://www.themoviedb.org/${type}/${data.id}`;
   qs('#modalClose',modal).addEventListener('click', closeModal);
   qs('#modalFav',modal).addEventListener('click', ()=>{ toggleFavorite(data); qs('#modalFav',modal).textContent = state.favorites.has('m'+data.id)?'★ Favorited':'☆ Add to favorites'; renderFavoritesUI(); });
-  // fetch providers specifically and render in modal container
   (async ()=>{
     try{
       const prov = await apiFetch(`/${type}/${data.id}/watch/providers`);
       const country = state.region || 'US';
-      const container = qs('#watchProvidersContainer', modal) || modal.querySelector('#watchProvidersContainer');
+      const container = modal.querySelector('#watchProvidersContainer');
       container.innerHTML = '';
       if(prov && prov.results && prov.results[country]){
         const info = prov.results[country];
@@ -424,7 +518,6 @@ function showModal(type,data,opts={}){
     }catch(e){ console.warn(e); }
   })();
 
-  // similar
   if(data.similar && data.similar.results){
     const simList = modal.querySelector('#similarList');
     simList.innerHTML = data.similar.results.slice(0,8).map(s=>`<div style="min-width:110px;cursor:pointer"><img src="${s.poster_path?IMG_BASE+s.poster_path:''}" style="width:100%;height:160px;object-fit:cover;border-radius:8px"><div style="font-size:12px;margin-top:6px">${truncate(s.title||s.name,20)}</div></div>`).join('');
@@ -446,6 +539,12 @@ async function loadTrending(reset=true){
   state.tab='trending'; state.loading=true;
   const data = await apiFetch('/trending/all/day',{page:state.page});
   const list = (data.results||[]).map(it=>({...it, media_type: it.media_type|| (it.title?'movie':'tv')}));
+  if(list.length === 0 && (data && Object.keys(data).length === 0)){
+    // API returned empty or error - show friendly error and stop loading
+    state.loading = false;
+    renderErrorCard('No trending data (check API key / rate limits).');
+    return;
+  }
   if(reset) state.results=list; else state.results = state.results.concat(list);
   state.totalPages = data.total_pages || 1; updateUIAfterLoad(list,reset); state.loading=false;
 }
@@ -453,14 +552,17 @@ async function loadTrending(reset=true){
 async function loadMovies(reset=true){
   if(reset){ state.page=1; state.results=[];}
   state.tab='movies'; state.loading=true;
-  const params = {page: state.page, sort_by: 'popularity.desc', with_watch_monetization_types: state.preset==='free'? 'free' : undefined};
+  const params = {page: state.page, sort_by: 'popularity.desc'};
   if(state.genre) params.with_genres = state.genre;
   if(state.year) params.primary_release_year = state.year;
   if(state.provider) params.with_watch_providers = state.provider;
-  const path = state.query ? '/search/movie' : '/discover/movie';
   if(state.query) params.query = state.query;
+  const path = state.query ? '/search/movie' : '/discover/movie';
   const data = await apiFetch(path, params);
   const list = (data.results||[]).map(it=>({...it, media_type:'movie'}));
+  if(list.length === 0 && (data && Object.keys(data).length === 0)){
+    state.loading=false; renderErrorCard('No movie data (check API key / rate limits).'); return;
+  }
   if(reset) state.results=list; else state.results = state.results.concat(list);
   state.totalPages = data.total_pages || 1; updateUIAfterLoad(list,reset); state.loading=false;
 }
@@ -476,6 +578,9 @@ async function loadTV(reset=true){
   const path = state.query ? '/search/tv' : '/discover/tv';
   const data = await apiFetch(path, params);
   const list = (data.results||[]).map(it=>({...it, media_type:'tv'}));
+  if(list.length === 0 && (data && Object.keys(data).length === 0)){
+    state.loading=false; renderErrorCard('No TV data (check API key / rate limits).'); return;
+  }
   if(reset) state.results=list; else state.results = state.results.concat(list);
   state.totalPages = data.total_pages || 1; updateUIAfterLoad(list,reset); state.loading=false;
 }
@@ -485,6 +590,9 @@ async function loadTopRated(reset=true){
   state.tab='toprated'; state.loading=true;
   const data = await apiFetch('/movie/top_rated',{page:state.page});
   const list = (data.results||[]).map(it=>({...it, media_type:'movie'}));
+  if(list.length === 0 && (data && Object.keys(data).length === 0)){
+    state.loading=false; renderErrorCard('No top-rated data (check API key / rate limits).'); return;
+  }
   if(reset) state.results=list; else state.results = state.results.concat(list);
   state.totalPages = data.total_pages || 1; updateUIAfterLoad(list,reset); state.loading=false;
 }
@@ -493,7 +601,8 @@ async function doSearch(q){
   state.query = q.trim(); state.page=1;
   if(!q) return loadCurrentTab(true);
   const data = await apiFetch('/search/multi',{query:state.query,page:state.page});
-  state.results = (data.results||[]);
+  if(data && data.results) state.results = (data.results||[]);
+  else { renderErrorCard('Search failed or returned no results.'); return; }
   state.totalPages = data.total_pages||1;
   updateUIAfterLoad(state.results, true);
 }
@@ -519,12 +628,11 @@ function setupPresetChips(){
     ch.classList.add('active');
     const p = ch.dataset.preset;
     state.preset = p;
-    // apply quick presets
     if(p==='popular'){ state.genre=''; state.provider=''; state.page=1; state.query=''; loadMovies(true); }
     else if(p==='recent'){ state.genre=''; state.year = (new Date()).getFullYear(); state.page=1; loadMovies(true); }
     else if(p==='highrated'){ state.genre=''; state.page=1; loadTopRated(true); }
     else if(p==='free'){ state.provider=''; state.page=1; state.preset='free'; loadMovies(true); }
-    else if(p==='hindifilms'){ state.genre=''; state.page=1; state.query=''; /* attempt: set language param when discovery; TMDB uses with_original_language */ state.with_original_language='hi'; loadMovies(true); }
+    else if(p==='hindifilms'){ state.genre=''; state.page=1; state.query=''; state.with_original_language='hi'; loadMovies(true); }
     else if(p==='family'){ state.genre=''; state.page=1; loadMovies(true); }
   }));
 }
@@ -534,7 +642,6 @@ async function loadProvidersList(){
   try{
     const movieProv = await apiFetch('/watch/providers/movie',{});
     const tvProv = await apiFetch('/watch/providers/tv',{});
-    // merge and unique by provider_id
     const map = new Map();
     (movieProv.results||[]).forEach(p=> map.set(p.provider_id, p));
     (tvProv.results||[]).forEach(p=> map.set(p.provider_id, p));
@@ -572,7 +679,6 @@ function setupDropdownToggles(){
   providerSelected.addEventListener('click', ()=> providerListEl.style.display = providerListEl.style.display === 'block' ? 'none' : 'block');
   genreSelected.addEventListener('click', ()=> genreListEl.style.display = genreListEl.style.display === 'block' ? 'none' : 'block');
   yearSelected.addEventListener('click', ()=> yearListEl.style.display = yearListEl.style.display === 'block' ? 'none' : 'block');
-  // close on outside click
   document.addEventListener('click', (e)=>{ if(!providersEl.contains(e.target)) providerListEl.style.display='none'; if(!genresEl.contains(e.target)) genreListEl.style.display='none'; if(!yearsEl.contains(e.target)) yearListEl.style.display='none'; });
 }
 
@@ -635,7 +741,7 @@ init();
 
 /* expose debug utils */
 window.__chEck = { state, loadMovies, loadTV, loadTrending, apiFetch };
-
 </script>
+
 </body>
 </html>
