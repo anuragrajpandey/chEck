@@ -287,31 +287,42 @@
     font-size:10px;
   }
 
-  /* ALL TRENDING VERTICAL LIST */
+  /* ALL TRENDING – GRID LAYOUT */
   .list-vertical{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding:2px 0 4px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    padding:2px 0 8px;
   }
+  @media (min-width:480px){
+    .list-vertical{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+  }
+
   .card-v{
     display:flex;
-    gap:10px;
-    padding:8px;
+    flex-direction:column;
+    padding:7px;
     border-radius:var(--radius-md);
     background:var(--glass);
     border:1px solid rgba(15,23,42,0.9);
-    box-shadow:0 18px 48px rgba(15,23,42,0.95);
+    box-shadow:0 14px 35px rgba(15,23,42,0.95);
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .card-v:active{
+    transform:scale(.97) translateY(1px);
+    box-shadow:var(--focus-glow);
   }
   .card-v-img{
-    width:86px;
-    flex-shrink:0;
+    width:100%;
     border-radius:var(--radius-sm);
     overflow:hidden;
     background:#020617;
     aspect-ratio:2/3;
+    margin-bottom:6px;
   }
   .card-v-img img{
     width:100%;
@@ -327,10 +338,10 @@
     display:flex;
     justify-content:space-between;
     align-items:flex-start;
-    gap:6px;
+    gap:4px;
   }
   .card-v-title{
-    font-size:13px;
+    font-size:12px;
     font-weight:600;
     white-space:nowrap;
     overflow:hidden;
@@ -341,8 +352,8 @@
     color:var(--muted);
   }
   .card-v-overview{
-    margin-top:4px;
-    font-size:11px;
+    margin-top:3px;
+    font-size:10px;
     color:var(--muted);
     line-height:1.4;
   }
@@ -654,7 +665,7 @@
     justify-content:space-between;
   }
 
-  /* SPLASH (from your snippet, trimmed to avoid duplicate style blocks) */
+  /* SPLASH */
   .splash {
     position:fixed;
     inset:0;
@@ -775,7 +786,7 @@
     <div id="topMovieRow" class="shelf-row"></div>
   </section>
 
-  <!-- All Trending vertical -->
+  <!-- All Trending vertical (now grid) -->
   <section class="section">
     <div class="section-header">
       <span class="section-header-title">All Trending</span>
@@ -970,7 +981,7 @@ function buildVerticalCard(item){
         <div class="card-v-title">${escapeHtml(title)}</div>
         <div class="card-v-year">${year}</div>
       </div>
-      <div class="card-v-overview">${truncate(item.overview,140)}</div>
+      <div class="card-v-overview">${truncate(item.overview,100)}</div>
       <div style="margin-top:4px;font-size:11px;color:var(--muted);">${rating} ★</div>
     </div>
   `;
