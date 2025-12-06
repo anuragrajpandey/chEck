@@ -76,13 +76,21 @@
   spans.forEach((sp, i) => setTimeout(()=> sp.classList.add('show'), i*160));
   const typingDuration = letters.length * 160;
   const hold = 800;
-  setTimeout(()=>{ splash.classList.add('hidden'); setTimeout(()=>{ const app = document.querySelector('.app'); if(app) app.style.visibility='visible'; splash.setAttribute('aria-hidden','true'); setTimeout(()=>{ try{ splash.remove(); }catch(e){} },800); },600); }, typingDuration + hold);
+  setTimeout(()=>{ 
+    splash.classList.add('hidden'); 
+    setTimeout(()=>{ 
+      const app = document.querySelector('.app'); 
+      if(app) app.style.visibility='visible'; 
+      splash.setAttribute('aria-hidden','true'); 
+      setTimeout(()=>{ try{ splash.remove(); }catch(e){} },800); 
+    },600); 
+  }, typingDuration + hold);
 })();
 </script>
 <!-- ======= End Splash ======= -->
 
 <!-- =========================
-     Styles: premium UI + native-like mobile + popup demo style
+     Styles: premium UI + responsive + app-like
      ========================= -->
 <style>
 :root{
@@ -110,12 +118,26 @@ body{
     radial-gradient(1200px 600px at 90% 0%, rgba(34,197,235,0.18), transparent 22%),
     linear-gradient(180deg,var(--bg),#020203 160%);
   color:#e8f1f8;
-  padding:20px;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* outer layout that adapts */
+.page{
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:flex-start;
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
+  padding:16px;
+}
+
+/* shell that changes shape by device width */
+.app-shell{
+  width:100%;
+  max-width:1150px;
+  background:transparent;
+  border-radius:26px;
+  padding:16px;
 }
 
 /* scrollbars minimal, no white stripes */
@@ -132,16 +154,36 @@ body{
   width:100%;
   max-width:var(--max-w);
   display:grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 1.6fr 0.9fr; /* main + side-column on desktop */
   gap:var(--gap);
   align-items:flex-start;
   visibility:hidden; /* revealed after splash */
 }
 
-/* mobile: feel like native */
-@media (max-width:900px){
-  body{
+/* tablet & small laptop */
+@media (max-width:1024px){
+  .page{
     padding:12px;
+  }
+  .app-shell{
+    max-width:900px;
+    padding:12px;
+    border-radius:22px;
+  }
+  .app{
+    grid-template-columns: minmax(0,1.5fr) minmax(0,1fr);
+  }
+}
+
+/* phone + small tablets */
+@media (max-width:900px){
+  .page{
+    padding:10px;
+  }
+  .app-shell{
+    max-width:540px;
+    padding:10px;
+    border-radius:18px;
   }
   .app{
     grid-template-columns:1fr;
@@ -149,6 +191,18 @@ body{
     margin:0 auto;
   }
   .right{ display:none; }
+}
+
+/* edge-to-edge on very small phones */
+@media (max-width:600px){
+  .page{
+    padding:8px 6px 10px;
+  }
+  .app-shell{
+    padding:8px 8px 10px;
+    max-width:100%;
+    border-radius:0; /* full bleed, like real app */
+  }
 }
 
 /* header */
@@ -317,6 +371,18 @@ body{
   border-radius:12px;
   color:var(--muted);
   cursor:pointer;
+}
+
+/* make hero vertical on very small screens */
+@media (max-width:600px){
+  .hero{
+    flex-direction:row;
+    align-items:flex-start;
+  }
+  .hero-poster{
+    width:110px;
+    height:165px;
+  }
 }
 
 /* filter row */
@@ -676,135 +742,139 @@ body{
 </head>
 <body>
 
-<div class="app">
-  <!-- header -->
-  <div class="header">
-    <div class="brand">
-      <div class="text-logo">
-        <span class="bigE">E</span>
-        <span class="small">chEck</span>
-      </div>
-      <div>
-        <div style="font-weight:700">chEck</div>
-        <div class="meta">Top picks · Movies & TV</div>
-      </div>
-    </div>
-
-    <div style="flex:1;display:flex;justify-content:flex-end;">
-      <div class="controls">
-        <div class="search" title="Search movies & shows">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M21 21l-4.35-4.35" stroke="#9aa6b2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="11" cy="11" r="6" stroke="#9aa6b2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <input id="searchInput" placeholder="Search movies, TV shows…" aria-label="Search movies and TV shows" />
+<div class="page">
+  <div class="app-shell">
+    <div class="app">
+      <!-- header -->
+      <div class="header">
+        <div class="brand">
+          <div class="text-logo">
+            <span class="bigE">E</span>
+            <span class="small">chEck</span>
+          </div>
+          <div>
+            <div style="font-weight:700">chEck</div>
+            <div class="meta">Top picks · Movies & TV</div>
+          </div>
         </div>
-        <button id="favOpen" class="icon-btn" title="Open favorites">★</button>
+
+        <div style="flex:1;display:flex;justify-content:flex-end;">
+          <div class="controls">
+            <div class="search" title="Search movies & shows">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 21l-4.35-4.35" stroke="#9aa6b2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="11" cy="11" r="6" stroke="#9aa6b2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <input id="searchInput" placeholder="Search movies, TV shows…" aria-label="Search movies and TV shows" />
+            </div>
+            <button id="favOpen" class="icon-btn" title="Open favorites">★</button>
+          </div>
+        </div>
       </div>
+
+      <!-- tabs -->
+      <div class="tabs" role="tablist" aria-label="Main sections">
+        <button class="tab active" data-tab="trending">Trending</button>
+        <button class="tab" data-tab="movies">Movies</button>
+        <button class="tab" data-tab="tv">TV Shows</button>
+        <button class="tab" data-tab="toprated">Top Rated</button>
+      </div>
+
+      <!-- left -->
+      <div class="left">
+        <!-- hero -->
+        <section class="hero" id="hero">
+          <div class="hero-poster" id="heroPoster"></div>
+          <div class="hero-info">
+            <h2 id="heroTitle">Top Picks Today</h2>
+            <div class="meta" id="heroMeta">Curated picks updated live</div>
+            <div class="hero-overview" id="heroOverview">Loading picks…</div>
+            <div class="actions">
+              <button id="heroPlay" class="btn-primary">▶ Play Trailer</button>
+              <button id="heroFav" class="btn-ghost">☆ Favorite</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- top10 carousels -->
+        <div class="carousel-wrap" id="topMoviesWrap" aria-hidden="true">
+          <div class="carousel-title">
+            <h3>Top 10 Movies</h3>
+            <div>
+              <button class="carousel-arrow" id="tm-left" aria-label="Scroll left">‹</button>
+              <button class="carousel-arrow" id="tm-right" aria-label="Scroll right">›</button>
+            </div>
+          </div>
+          <div class="carousel">
+            <div id="topMoviesTrack" class="carousel-track" tabindex="0" aria-label="Top 10 Movies"></div>
+          </div>
+        </div>
+
+        <div class="carousel-wrap" id="topTVWrap" aria-hidden="true">
+          <div class="carousel-title">
+            <h3>Top 10 TV Shows</h3>
+            <div>
+              <button class="carousel-arrow" id="tv-left" aria-label="Scroll left">‹</button>
+              <button class="carousel-arrow" id="tv-right" aria-label="Scroll right">›</button>
+            </div>
+          </div>
+          <div class="carousel">
+            <div id="topTVTrack" class="carousel-track" tabindex="0" aria-label="Top 10 TV Shows"></div>
+          </div>
+        </div>
+
+        <!-- filters -->
+        <div class="filter-row">
+          <div class="chips" id="presetChips">
+            <div class="chip" data-preset="popular">🔥 Popular</div>
+            <div class="chip" data-preset="recent">🆕 Latest</div>
+            <div class="chip" data-preset="highrated">🏆 Top Rated</div>
+            <div class="chip" data-preset="free">🎬 Free</div>
+            <div class="chip" data-preset="hindifilms">🇮🇳 Hindi</div>
+          </div>
+
+          <div class="fancy-select" id="providerSelect">
+            <div class="selected">Provider: <strong id="providerLabel" style="margin-left:4px;color:#e5e7eb;">Any</strong></div>
+            <div class="dropdown-list" id="providerList" style="display:none"></div>
+          </div>
+
+          <div class="fancy-select" id="genreSelectWrap">
+            <div class="selected">Genre: <strong id="genreLabel" style="margin-left:4px;color:#e5e7eb;">All</strong></div>
+            <div class="dropdown-list" id="genreList" style="display:none"></div>
+          </div>
+
+          <div class="fancy-select" id="yearSelectWrap">
+            <div class="selected">Year: <strong id="yearLabel" style="margin-left:4px;color:#e5e7eb;">Any</strong></div>
+            <div class="dropdown-list" id="yearList" style="display:none;max-height:160px"></div>
+          </div>
+        </div>
+
+        <!-- grid -->
+        <section>
+          <div id="grid" class="grid" aria-live="polite" aria-label="Results grid"></div>
+          <div id="infiniteLoader" style="padding:14px;text-align:center;color:var(--muted);font-size:12px">Loading more…</div>
+        </section>
+
+        <div class="footer">
+          <div>© <span id="year"></span> chEck</div>
+          <div>Mobile-first • Fast • Clean</div>
+        </div>
+      </div>
+
+      <!-- right -->
+      <aside class="right">
+        <div class="panel">
+          <h3>Explore</h3>
+          <p>Use the search and filters to quickly find movies & shows. Tap any poster to open a detailed popup with platforms and trailer.</p>
+        </div>
+
+        <div class="panel">
+          <h3>About chEck</h3>
+          <p>UI-only client powered by TMDb. For production, secure your API key via a serverless proxy.</p>
+        </div>
+      </aside>
     </div>
   </div>
-
-  <!-- tabs -->
-  <div class="tabs" role="tablist" aria-label="Main sections">
-    <button class="tab active" data-tab="trending">Trending</button>
-    <button class="tab" data-tab="movies">Movies</button>
-    <button class="tab" data-tab="tv">TV Shows</button>
-    <button class="tab" data-tab="toprated">Top Rated</button>
-  </div>
-
-  <!-- left -->
-  <div class="left">
-    <!-- hero -->
-    <section class="hero" id="hero">
-      <div class="hero-poster" id="heroPoster"></div>
-      <div class="hero-info">
-        <h2 id="heroTitle">Top Picks Today</h2>
-        <div class="meta" id="heroMeta">Curated picks updated live</div>
-        <div class="hero-overview" id="heroOverview">Loading picks…</div>
-        <div class="actions">
-          <button id="heroPlay" class="btn-primary">▶ Play Trailer</button>
-          <button id="heroFav" class="btn-ghost">☆ Favorite</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- top10 carousels -->
-    <div class="carousel-wrap" id="topMoviesWrap" aria-hidden="true">
-      <div class="carousel-title">
-        <h3>Top 10 Movies</h3>
-        <div>
-          <button class="carousel-arrow" id="tm-left" aria-label="Scroll left">‹</button>
-          <button class="carousel-arrow" id="tm-right" aria-label="Scroll right">›</button>
-        </div>
-      </div>
-      <div class="carousel">
-        <div id="topMoviesTrack" class="carousel-track" tabindex="0" aria-label="Top 10 Movies"></div>
-      </div>
-    </div>
-
-    <div class="carousel-wrap" id="topTVWrap" aria-hidden="true">
-      <div class="carousel-title">
-        <h3>Top 10 TV Shows</h3>
-        <div>
-          <button class="carousel-arrow" id="tv-left" aria-label="Scroll left">‹</button>
-          <button class="carousel-arrow" id="tv-right" aria-label="Scroll right">›</button>
-        </div>
-      </div>
-      <div class="carousel">
-        <div id="topTVTrack" class="carousel-track" tabindex="0" aria-label="Top 10 TV Shows"></div>
-      </div>
-    </div>
-
-    <!-- filters -->
-    <div class="filter-row">
-      <div class="chips" id="presetChips">
-        <div class="chip" data-preset="popular">🔥 Popular</div>
-        <div class="chip" data-preset="recent">🆕 Latest</div>
-        <div class="chip" data-preset="highrated">🏆 Top Rated</div>
-        <div class="chip" data-preset="free">🎬 Free</div>
-        <div class="chip" data-preset="hindifilms">🇮🇳 Hindi</div>
-      </div>
-
-      <div class="fancy-select" id="providerSelect">
-        <div class="selected">Provider: <strong id="providerLabel" style="margin-left:4px;color:#e5e7eb;">Any</strong></div>
-        <div class="dropdown-list" id="providerList" style="display:none"></div>
-      </div>
-
-      <div class="fancy-select" id="genreSelectWrap">
-        <div class="selected">Genre: <strong id="genreLabel" style="margin-left:4px;color:#e5e7eb;">All</strong></div>
-        <div class="dropdown-list" id="genreList" style="display:none"></div>
-      </div>
-
-      <div class="fancy-select" id="yearSelectWrap">
-        <div class="selected">Year: <strong id="yearLabel" style="margin-left:4px;color:#e5e7eb;">Any</strong></div>
-        <div class="dropdown-list" id="yearList" style="display:none;max-height:160px"></div>
-      </div>
-    </div>
-
-    <!-- grid -->
-    <section>
-      <div id="grid" class="grid" aria-live="polite" aria-label="Results grid"></div>
-      <div id="infiniteLoader" style="padding:14px;text-align:center;color:var(--muted);font-size:12px">Loading more…</div>
-    </section>
-
-    <div class="footer">
-      <div>© <span id="year"></span> chEck</div>
-      <div>Mobile-first • Fast • Clean</div>
-    </div>
-  </div>
-
-  <!-- right -->
-  <aside class="right">
-    <div class="panel">
-      <h3>Explore</h3>
-      <p>Use the search and filters to quickly find movies & shows. Tap any poster to open a detailed popup with platforms and trailer.</p>
-    </div>
-
-    <div class="panel">
-      <h3>About chEck</h3>
-      <p>UI-only client powered by TMDb. For production, secure your API key via a serverless proxy.</p>
-    </div>
-  </aside>
 </div>
 
 <!-- Popup container EXACT like demo -->
@@ -1013,7 +1083,7 @@ async function loadTV(reset=true){
   const path = state.query?'/search/tv':'/discover/tv';
   const data = await apiFetch(path,params);
   state.totalPages=data.total_pages||1;
-  const list = (data.results||[]).map(it=>({...it,media_type:'tv'}));
+  const list=(data.results||[]).map(it=>({...it,media_type:'tv'}));
   if(!list.length){ state.loading=false; renderErrorCard('No TV data.'); return; }
   if(reset) state.results=list; else state.results=state.results.concat(list);
   renderGrid(list,!reset);
