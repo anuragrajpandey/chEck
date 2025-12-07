@@ -132,6 +132,11 @@
     border-color:rgba(248,250,252,0.9);
     background:rgba(15,23,42,1);
   }
+  .icon-btn.active{
+    border-color:#fbbf24;
+    box-shadow:0 0 0 1px rgba(251,191,36,0.4),0 10px 30px rgba(15,23,42,0.9);
+    color:#fde68a;
+  }
   .icon-badge{
     font-size:11px;
     padding:0 5px;
@@ -139,6 +144,17 @@
     background:rgba(15,23,42,0.96);
     border-radius:999px;
     border:1px solid rgba(148,163,184,0.7);
+  }
+
+  /* VIEWS */
+  .views{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .view{
+    flex:1;
   }
 
   /* HERO */
@@ -371,7 +387,7 @@
     background:rgba(15,23,42,0.96);
   }
 
-  /* GRID (All Trending) */
+  /* GRID (Trending + Favourites) */
   .list-vertical{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -443,6 +459,12 @@
     color:var(--muted);
     line-height:1.4;
   }
+  .card-v-rating{
+    margin-top:4px;
+    font-size:11px;
+    color:var(--muted);
+  }
+
   #verticalLoader{
     font-size:11px;
     text-align:center;
@@ -961,67 +983,86 @@
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="hero-poster-wrap shimmer" id="heroPoster"></div>
-      <div class="hero-info">
-        <div class="hero-kicker">Today’s spotlight</div>
-        <div class="hero-title-row">
-          <div id="heroTitle">Top picks today</div>
-          <div id="heroMeta">—</div>
+  <main class="views">
+    <!-- HOME VIEW -->
+    <div id="homeView" class="view">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-inner">
+          <div class="hero-poster-wrap shimmer" id="heroPoster"></div>
+          <div class="hero-info">
+            <div class="hero-kicker">Today’s spotlight</div>
+            <div class="hero-title-row">
+              <div id="heroTitle">Top picks today</div>
+              <div id="heroMeta">—</div>
+            </div>
+            <div class="hero-chips">
+              <span class="hero-chip">Trending now</span>
+              <span class="hero-chip">Tap for full details</span>
+            </div>
+            <div id="heroOverview">
+              Scroll to explore trending movies & shows. Tap any poster for a detail sheet with where to watch.
+            </div>
+            <div class="hero-actions">
+              <button id="heroPlay" class="btn-primary">▶ Open details</button>
+              <button id="heroFav" class="btn-outline">☆ Favorite</button>
+            </div>
+          </div>
         </div>
-        <div class="hero-chips">
-          <span class="hero-chip">Trending now</span>
-          <span class="hero-chip">Tap for full details</span>
+      </section>
+
+      <!-- For you -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-header-title">For you</span>
+          <span class="section-header-sub">Handpicked from today’s trending</span>
         </div>
-        <div id="heroOverview">
-          Scroll to explore trending movies & shows. Tap any poster for a detail sheet with where to watch.
+        <div id="forYouRow" class="shelf-row"></div>
+      </section>
+
+      <!-- Top 10 TV Shows -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-header-title">Top 10 TV Shows</span>
+          <span class="section-header-sub">Based on your region</span>
         </div>
-        <div class="hero-actions">
-          <button id="heroPlay" class="btn-primary">▶ Open details</button>
-          <button id="heroFav" class="btn-outline">☆ Favorite</button>
+        <div id="topTvRow" class="shelf-row"></div>
+      </section>
+
+      <!-- Top 10 Movies -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-header-title">Top 10 Movies</span>
+          <span class="section-header-sub">Based on your region</span>
         </div>
-      </div>
-    </div>
-  </section>
+        <div id="topMovieRow" class="shelf-row"></div>
+      </section>
 
-  <!-- For you -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-header-title">For you</span>
-      <span class="section-header-sub">Handpicked from today’s trending</span>
+      <!-- All Trending vertical (grid) -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-header-title">All Trending</span>
+          <span class="section-header-sub">Scroll down to load more</span>
+        </div>
+        <div id="verticalList" class="list-vertical"></div>
+        <div id="verticalLoader">Loading more…</div>
+      </section>
     </div>
-    <div id="forYouRow" class="shelf-row"></div>
-  </section>
 
-  <!-- Top 10 TV Shows -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-header-title">Top 10 TV Shows</span>
-      <span class="section-header-sub">Based on your region</span>
+    <!-- FAVOURITES VIEW -->
+    <div id="favView" class="view" style="display:none;">
+      <section class="section">
+        <div class="section-header">
+          <span class="section-header-title">Favourites</span>
+          <span class="section-header-sub">Saved movies & shows</span>
+        </div>
+        <div id="favEmpty" style="font-size:11px;color:var(--muted);padding:8px 2px;display:none;">
+          No favourites yet. Tap ☆ on any title to save it here.
+        </div>
+        <div id="favList" class="list-vertical"></div>
+      </section>
     </div>
-    <div id="topTvRow" class="shelf-row"></div>
-  </section>
-
-  <!-- Top 10 Movies -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-header-title">Top 10 Movies</span>
-      <span class="section-header-sub">Based on your region</span>
-    </div>
-    <div id="topMovieRow" class="shelf-row"></div>
-  </section>
-
-  <!-- All Trending vertical (grid) -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-header-title">All Trending</span>
-      <span class="section-header-sub">Scroll down to load more</span>
-    </div>
-    <div id="verticalList" class="list-vertical"></div>
-    <div id="verticalLoader">Loading more…</div>
-  </section>
+  </main>
 
   <footer>
     <span>© <span id="year"></span> chEck</span>
@@ -1129,6 +1170,68 @@ const state = {
   search:{query:'',page:1,totalPages:1,loading:false,active:false}
 };
 
+/* ROUTING: HOME / FAVOURITES */
+function setFavIconActive(on){
+  const btn=qs('#favOpen');
+  if(!btn) return;
+  if(on) btn.classList.add('active');
+  else btn.classList.remove('active');
+}
+
+function renderFavoritesGrid(){
+  const container=qs('#favList');
+  const empty=qs('#favEmpty');
+  if(!container || !empty) return;
+  const list=Array.from(state.favorites.values());
+  if(!list.length){
+    container.innerHTML='';
+    empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+  container.innerHTML='';
+  list.forEach(item=>{
+    const card=document.createElement('div');
+    card.className='card-v';
+    const title=item.title||'Untitled';
+    const year=(item.release_date||'').slice(0,4)||'—';
+    const rating=item.vote_average?Number(item.vote_average).toFixed(1):'—';
+    const img=item.poster_path? IMG_BASE+item.poster_path:'';
+    card.innerHTML=`
+      <div class="card-v-img">
+        ${img?`<img src="${img}" alt="${escapeHtml(title)}">`:`<div class="shimmer" style="width:100%;height:100%;"></div>`}
+      </div>
+      <div class="card-v-main">
+        <div class="card-v-title-row">
+          <div class="card-v-title">${escapeHtml(title)}</div>
+          <div class="card-v-year">${year}</div>
+        </div>
+        <div class="card-v-overview">${truncate(item.overview || '',100)}</div>
+        <div class="card-v-rating">${rating} ★</div>
+      </div>
+    `;
+    card.addEventListener('click',()=>openDetails(item));
+    container.appendChild(card);
+  });
+}
+
+function handleRoute(){
+  const hash=(location.hash||'').toLowerCase();
+  const home=qs('#homeView');
+  const fav=qs('#favView');
+  if(!home || !fav) return;
+  if(hash==='#favourite'){
+    home.style.display='none';
+    fav.style.display='block';
+    renderFavoritesGrid();
+    setFavIconActive(true);
+  }else{
+    home.style.display='block';
+    fav.style.display='none';
+    setFavIconActive(false);
+  }
+}
+
 /* Favorites */
 function loadFavorites(){
   try{
@@ -1154,7 +1257,9 @@ function toggleFavorite(item){
       title:item.title||item.name,
       poster_path:item.poster_path||item.backdrop_path||'',
       media_type:item.media_type||guessMediaType(item),
-      release_date:item.release_date||item.first_air_date||''
+      release_date:item.release_date||item.first_air_date||'',
+      vote_average:item.vote_average||null,
+      overview:item.overview||''
     });
   }
   saveFavorites();
@@ -1165,7 +1270,13 @@ function updateFavoritesUI(){
   btn.innerHTML = state.favorites.size?`★<span class="icon-badge">${state.favorites.size}</span>`:'★';
   if(state.hero){
     const key='m'+state.hero.id;
-    qs('#heroFav').textContent = state.favorites.has(key)?'★ Favorited':'☆ Favorite';
+    const favBtn=qs('#heroFav');
+    if(favBtn){
+      favBtn.textContent = state.favorites.has(key)?'★ Favorited':'☆ Favorite';
+    }
+  }
+  if((location.hash||'').toLowerCase()==='#favourite'){
+    renderFavoritesGrid();
   }
 }
 
@@ -1209,7 +1320,7 @@ function buildVerticalCard(item){
         <div class="card-v-year">${year}</div>
       </div>
       <div class="card-v-overview">${truncate(item.overview,100)}</div>
-      <div style="margin-top:4px;font-size:11px;color:var(--muted);">${rating} ★</div>
+      <div class="card-v-rating">${rating} ★</div>
     </div>
   `;
   card.addEventListener('click',()=>openDetails(item));
@@ -1585,16 +1696,17 @@ function setupSearch(){
   });
 }
 
-/* Favorites modal (simple alert for now) */
-function setupFavoritesModal(){
-  qs('#favOpen').addEventListener('click',()=>{
-    const list=Array.from(state.favorites.values());
-    if(!list.length){
-      alert('No favorites yet. Tap ☆ on a title to save it.');
-      return;
+/* Favorites button navigates to #favourite */
+function setupFavoritesNav(){
+  const btn=qs('#favOpen');
+  if(!btn) return;
+  btn.addEventListener('click',()=>{
+    const current=(location.hash||'').toLowerCase();
+    if(current==='#favourite'){
+      location.hash='';
+    }else{
+      location.hash='#favourite';
     }
-    const names=list.slice(0,20).map(it=>it.title).join('\n• ');
-    alert('Favorites:\n• '+names+(list.length>20?`\n(and ${list.length-20} more…)`:'')); 
   });
 }
 
@@ -1608,8 +1720,11 @@ async function init(){
   }
   loadFavorites();
   setupSearch();
-  setupFavoritesModal();
+  setupFavoritesNav();
   setupVerticalInfinite();
+
+  window.addEventListener('hashchange',handleRoute);
+
   try{
     await loadForYou();
     await loadTopTV();
@@ -1619,6 +1734,8 @@ async function init(){
     console.error('init',e);
     qs('#verticalList').innerHTML=`<div style="font-size:11px;color:var(--muted);padding:6px;">Error: ${escapeHtml(e.message||'')}</div>`;
   }
+
+  handleRoute(); // apply route on first load (home or #favourite)
 }
 init();
 </script>
