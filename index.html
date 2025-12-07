@@ -46,6 +46,16 @@
     touch-action:none;
   }
 
+  /* Kill blue tap highlight + outline on buttons & links */
+  button, a{
+    -webkit-tap-highlight-color:transparent;
+    outline:none;
+  }
+  button:focus-visible,
+  a:focus-visible{
+    outline:none;
+  }
+
   .app{
     max-width:650px;
     margin:0 auto;
@@ -84,7 +94,7 @@
     align-items:center;
     justify-content:center;
     box-shadow:0 10px 25px rgba(15,23,42,0.9);
-    overflow:hidden; /* soft rounded corners for the logo image */
+    overflow:hidden; /* soft rounded corners */
   }
   .logo-img{
     width:32px;
@@ -110,7 +120,7 @@
     gap:8px;
   }
   .icon-btn{
-    width:32px;
+    min-width:32px;
     height:32px;
     border-radius:999px;
     border:1px solid rgba(148,163,184,0.4);
@@ -118,11 +128,13 @@
     display:inline-flex;
     align-items:center;
     justify-content:center;
+    padding:0 12px;
     color:#e5e7eb;
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
     transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
     box-shadow:0 10px 30px rgba(15,23,42,0.9);
+    font-size:12px;
   }
   .icon-btn:active{
     transform:scale(.94) translateY(1px);
@@ -135,13 +147,9 @@
     box-shadow:0 0 0 1px rgba(251,191,36,0.4),0 10px 30px rgba(15,23,42,0.9);
     color:#fde68a;
   }
-  .icon-badge{
-    font-size:11px;
-    padding:0 5px;
-    margin-left:2px;
-    background:rgba(15,23,42,0.96);
-    border-radius:999px;
-    border:1px solid rgba(148,163,184,0.7);
+  .fav-heart-text{
+    font-size:12px;
+    font-weight:500;
   }
 
   /* VIEWS */
@@ -296,7 +304,7 @@
     background:rgba(15,23,42,1);
   }
 
-  /* --- AD STRIP (Premium Rounded Banner) --- */
+  /* --- AD STRIP (EliteStocks TV banner) --- */
   .ad-strip-wrapper{
     margin-top:12px;
   }
@@ -417,7 +425,7 @@
     background:rgba(15,23,42,0.96);
   }
 
-  /* GRID (Trending + Favourites) */
+  /* GRID (Trending + Wishlist) */
   .list-vertical{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -1006,8 +1014,8 @@
           <circle cx="11" cy="11" r="6" stroke="#e5e7eb" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <button id="favOpen" class="icon-btn" aria-label="Favorites">
-        <span>★</span>
+      <button id="favOpen" class="icon-btn" aria-label="Wishlists">
+        <span class="fav-heart-text">Wishlists</span>
       </button>
     </div>
   </header>
@@ -1034,7 +1042,7 @@
             </div>
             <div class="hero-actions">
               <button id="heroPlay" class="btn-primary">▶ Open details</button>
-              <button id="heroFav" class="btn-outline">☆ Favorite</button>
+              <button id="heroFav" class="btn-outline">♡ Add to wishlist</button>
             </div>
           </div>
         </div>
@@ -1089,15 +1097,15 @@
       </section>
     </div>
 
-    <!-- FAVOURITES VIEW -->
+    <!-- WISHLIST VIEW -->
     <div id="favView" class="view" style="display:none;">
       <section class="section">
         <div class="section-header">
-          <span class="section-header-title">Favourites</span>
-          <span class="section-header-sub">Saved movies & shows</span>
+          <span class="section-header-title">Wishlist</span>
+          <span class="section-header-sub" id="favSectionMeta">No items yet</span>
         </div>
         <div id="favEmpty" style="font-size:11px;color:var(--muted);padding:8px 2px;display:none;">
-          No favourites yet. Tap ☆ on any title to save it here.
+          No items yet. Tap ♡ on any title to save it here.
         </div>
         <div id="favList" class="list-vertical"></div>
       </section>
@@ -1210,7 +1218,7 @@ const state = {
   search:{query:'',page:1,totalPages:1,loading:false,active:false}
 };
 
-/* ROUTING: HOME / FAVOURITES */
+/* ROUTING: HOME / WISHLIST */
 function setFavIconActive(on){
   const btn=qs('#favOpen');
   if(!btn) return;
@@ -1272,6 +1280,14 @@ function handleRoute(){
   }
 }
 
+/* Wishlist meta label under title – no numbers */
+function updateFavSectionMeta(){
+  const label = qs('#favSectionMeta');
+  if(!label) return;
+  const count = state.favorites.size;
+  label.textContent = count ? 'Saved movies & shows' : 'No items yet';
+}
+
 /* Favorites */
 function loadFavorites(){
   try{
@@ -1307,14 +1323,24 @@ function toggleFavorite(item){
 }
 function updateFavoritesUI(){
   const btn=qs('#favOpen');
-  btn.innerHTML = state.favorites.size?`★<span class="icon-badge">${state.favorites.size}</span>`:'★';
+
+  if(btn){
+    // Just keep text "Wishlists", no counts, no icons changing
+    btn.innerHTML = '<span class="fav-heart-text">Wishlists</span>';
+  }
+
   if(state.hero){
     const key='m'+state.hero.id;
     const favBtn=qs('#heroFav');
     if(favBtn){
-      favBtn.textContent = state.favorites.has(key)?'★ Favorited':'☆ Favorite';
+      favBtn.textContent = state.favorites.has(key)
+        ? '♥ In wishlist'
+        : '♡ Add to wishlist';
     }
   }
+
+  updateFavSectionMeta();
+
   if((location.hash||'').toLowerCase()==='#favourite'){
     renderFavoritesGrid();
   }
@@ -1574,7 +1600,7 @@ function showModal(data,type){
 
       <div class="modal-actions-bar">
         <button class="btn-primary" id="detailTrailer">▶ Watch trailer</button>
-        <button class="btn-outline" id="detailFav">☆ Favorite</button>
+        <button class="btn-outline" id="detailFav">♡ Add to wishlist</button>
       </div>
     </div>
   `;
@@ -1586,11 +1612,25 @@ function showModal(data,type){
   const vids=(data.videos&&data.videos.results)||[];
   const trailer=vids.find(v=>v.type && v.type.toLowerCase().includes('trailer') && v.site==='YouTube');
 
-  sheet.querySelector('#detailTrailer').onclick=()=>{
+  const trailerBtn = sheet.querySelector('#detailTrailer');
+  const favBtn = sheet.querySelector('#detailFav');
+  const favKey = 'm'+data.id;
+
+  const syncDetailFav = () => {
+    favBtn.textContent = state.favorites.has(favKey)
+      ? '♥ In wishlist'
+      : '♡ Add to wishlist';
+  };
+  syncDetailFav();
+
+  trailerBtn.onclick=()=>{
     if(trailer) window.open('https://www.youtube.com/watch?v='+trailer.key,'_blank');
     else alert('Trailer not available');
   };
-  sheet.querySelector('#detailFav').onclick=()=>toggleFavorite(data);
+  favBtn.onclick=()=>{
+    toggleFavorite(data);
+    syncDetailFav();
+  };
 
   const closeModal=()=>{
     root.innerHTML='';
@@ -1736,7 +1776,7 @@ function setupSearch(){
   });
 }
 
-/* Favorites button navigates to #favourite */
+/* Wishlist button navigates to #favourite */
 function setupFavoritesNav(){
   const btn=qs('#favOpen');
   if(!btn) return;
