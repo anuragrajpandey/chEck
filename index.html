@@ -6,6 +6,9 @@
 <title>chEck — Mobile Movies & Shows</title>
 <meta name="description" content="chEck — Apple TV inspired, mobile-first UI for top movies & TV. Powered by TMDb." />
 
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="https://i.ibb.co/dw75NTL2/ch-Eck-logo.png" />
+
 <style>
   :root{
     --bg:#020308;
@@ -73,26 +76,21 @@
     gap:8px;
   }
   .logo-pill{
-    padding:4px 10px;
-    border-radius:999px;
+    padding:3px;
+    border-radius:14px;
     background:radial-gradient(circle at 0% 0%,rgba(148,163,184,0.28),rgba(15,23,42,0.95));
     border:1px solid rgba(148,163,184,0.6);
     display:flex;
     align-items:center;
-    gap:4px;
+    justify-content:center;
     box-shadow:0 10px 25px rgba(15,23,42,0.9);
+    overflow:hidden; /* soft rounded corners for the logo image */
   }
-  .logo-pill-main{
-    font-weight:900;
-    font-size:18px;
-    background:linear-gradient(130deg,#ffffff,#c4f1f9);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-  }
-  .logo-pill-sub{
-    font-size:11px;
-    color:var(--muted);
+  .logo-img{
+    width:32px;
+    height:32px;
+    display:block;
+    border-radius:12px;
   }
   .brand-text{
     display:flex;
@@ -296,6 +294,38 @@
     transform:scale(.97);
     border-color:#e5e7eb;
     background:rgba(15,23,42,1);
+  }
+
+  /* --- AD STRIP (Premium Rounded Banner) --- */
+  .ad-strip-wrapper{
+    margin-top:12px;
+  }
+  .ad-strip{
+    display:block;
+    width:100%;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 14px 38px rgba(0,0,0,0.55);
+    cursor:pointer;
+    transform:scale(1);
+    transition:
+      transform .18s cubic-bezier(.2,.8,.3,1),
+      box-shadow .18s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .ad-strip:hover{
+    transform:scale(1.02);
+    box-shadow:0 18px 45px rgba(0,0,0,0.65);
+  }
+  .ad-strip:active{
+    transform:scale(0.96);
+    box-shadow:0 10px 28px rgba(0,0,0,0.55);
+  }
+  .ad-strip img{
+    width:100%;
+    height:auto;
+    display:block;
+    border-radius:18px;
   }
 
   /* SECTION HEADERS */
@@ -962,8 +992,7 @@
   <header>
     <div class="brand">
       <div class="logo-pill">
-        <span class="logo-pill-main">E</span>
-        <span class="logo-pill-sub">chEck</span>
+        <img src="https://i.ibb.co/dw75NTL2/ch-Eck-logo.png" alt="chEck logo" class="logo-img" />
       </div>
       <div class="brand-text">
         <span class="brand-text-title">chEck</span>
@@ -1010,6 +1039,17 @@
           </div>
         </div>
       </section>
+
+      <!-- Ad Banner Strip (EliteStocks TV) -->
+      <div class="ad-strip-wrapper">
+        <a href="https://tv.elitestocks.in"
+           class="ad-strip"
+           target="_blank"
+           rel="noopener">
+          <img src="https://i.ibb.co/67F2dKRn/Elite-Stocks-TV-Ad-on-ch-Eck.png"
+               alt="EliteStocks TV Ad">
+        </a>
+      </div>
 
       <!-- For you -->
       <section class="section">
